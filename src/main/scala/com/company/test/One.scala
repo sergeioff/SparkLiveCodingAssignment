@@ -14,7 +14,7 @@ object One extends App {
   val userDataAggregation = userActions.groupBy($"session_uuid")
     .agg(
       count(when($"client_action" === "click", true)) as "ClickCount",
-      countDistinct($"dom_element") as "NumberOfDomElements",
+      hll_sketch_estimate(hll_sketch_agg($"dom_element")) as "NumberOfDomElements", // Use HyperLogLog for distinct count
       sum(when($"potential_revenue" > 0 and $"client_action" === "click", 1)) as "PotentialRevenueClicks"
     )
 
